@@ -11,7 +11,7 @@ AS $$
 DECLARE
   v_token   text;
 BEGIN
-  SELECT token INTO v_token FROM tg.bot WHERE id = bot_id;
+  SELECT token INTO v_token FROM bot.list WHERE id = bot_id;
   IF FOUND THEN
     RETURN http.create_request(format('https://api.telegram.org/bot%s/sendMessage', v_token), 'POST', null, json_build_object('chat_id', chat_id, 'text', text)::text);
   END IF;
