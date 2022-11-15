@@ -26,7 +26,7 @@ BEGIN
 	  content := content || jsonb_build_object('parse_mode', parse_mode);
 	END IF;
 
-    RETURN http.create_request(format('https://api.telegram.org/bot%s/sendMessage', v_token), 'POST', null, content::text);
+    RETURN http.create_request(format('https://api.telegram.org/bot%s/sendMessage', v_token), 'POST', null, content::text, null, null, 'telegram', bot_id::text, 'sendMessage');
   END IF;
 
   RETURN null;
@@ -51,6 +51,31 @@ BEGIN
 
   IF FOUND THEN
     RETURN http.create_request(format('https://api.telegram.org/bot%s/getFile', v_token), 'POST', null, jsonb_build_object('file_id', file_id)::text, 'bot.get_file_done', 'bot.get_file_fail', 'telegram', bot_id::text, 'getFile');
+  END IF;
+
+  RETURN null;
+END;
+$$ LANGUAGE plpgsql
+  SECURITY DEFINER
+  SET search_path = tg, pg_temp;
+
+--------------------------------------------------------------------------------
+-- https://core.telegram.org/bots/api#getfile ----------------------------------
+--------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION tg.file_path (
+  bot_id        uuid,
+  file_id       text,
+  file_path     text
+) RETURNS       uuid
+AS $$
+DECLARE
+  v_token       text;
+BEGIN
+  SELECT token INTO v_token FROM bot.list WHERE id = bot_id;
+
+  IF FOUND THEN
+    RETURN http.create_request(format('https://api.telegram.org/file/bot%s/%s', v_token, file_path), 'GET', null, null, 'bot.get_file_done', 'bot.get_file_fail', 'telegram', bot_id::text, 'file_path', file_id);
   END IF;
 
   RETURN null;
