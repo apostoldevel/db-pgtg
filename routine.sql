@@ -8,7 +8,7 @@
 
 CREATE OR REPLACE FUNCTION tg.send_message (
   bot_id        uuid,
-  chat_id       int,
+  chat_id       bigint,
   text          text,
   parse_mode    text DEFAULT null,
   reply_markup  jsonb DEFAULT null
@@ -46,7 +46,7 @@ $$ LANGUAGE plpgsql
 
 CREATE OR REPLACE FUNCTION tg.send_document (
   bot_id        uuid,
-  chat_id       int,
+  chat_id       bigint,
   document      text,
   parse_mode    text DEFAULT null,
   reply_markup  jsonb DEFAULT null
@@ -84,7 +84,7 @@ $$ LANGUAGE plpgsql
 
 CREATE OR REPLACE FUNCTION tg.send_document_multipart (
   bot_id        uuid,
-  chat_id       int,
+  chat_id       bigint,
   file_name     text,
   file_body     text,
   content_type  text DEFAULT null
