@@ -41,6 +41,45 @@ $$ LANGUAGE plpgsql
   SET search_path = tg, pg_temp;
 
 --------------------------------------------------------------------------------
+-- https://core.telegram.org/bots/api#editmessagetext --------------------------
+--------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION tg.edit_message_text (
+  bot_id        uuid,
+  chat_id       bigint,
+  message_id    bigint,
+  text          text,
+  parse_mode    text DEFAULT null,
+  reply_markup  jsonb DEFAULT null
+) RETURNS       uuid
+AS $$
+DECLARE
+  v_token       text;
+  content       jsonb;
+BEGIN
+  SELECT token INTO v_token FROM bot.list WHERE id = bot_id;
+
+  IF FOUND THEN
+    content := jsonb_build_object('chat_id', chat_id, 'message_id', message_id, 'text', text);
+
+    IF parse_mode IS NOT NULL THEN
+	  content := content || jsonb_build_object('parse_mode', parse_mode);
+	END IF;
+
+    IF reply_markup IS NOT NULL THEN
+	  content := content || jsonb_build_object('reply_markup', reply_markup);
+	END IF;
+
+    RETURN http.create_request(format('https://api.telegram.org/bot%s/editMessageText', v_token), 'POST', jsonb_build_object('Content-Type', 'application/json'), content::text, null, null, 'telegram', bot_id::text, 'sendMessage');
+  END IF;
+
+  RETURN null;
+END;
+$$ LANGUAGE plpgsql
+  SECURITY DEFINER
+  SET search_path = tg, pg_temp;
+
+--------------------------------------------------------------------------------
 -- https://core.telegram.org/bots/api#senddocument -----------------------------
 --------------------------------------------------------------------------------
 
