@@ -31,7 +31,7 @@ BEGIN
 	  content := content || jsonb_build_object('reply_markup', reply_markup);
 	END IF;
 
-    RETURN http.create_request(format('https://api.telegram.org/bot%s/sendMessage', v_token), 'POST', jsonb_build_object('Content-Type', 'application/json'), content::text, null, null, 'telegram', bot_id::text, 'sendMessage');
+    RETURN http.create_request(format('https://api.telegram.org/bot%s/sendMessage', v_token), 'native', 'POST', jsonb_build_object('Content-Type', 'application/json'), content::text, null, null, 'telegram', bot_id::text, 'sendMessage');
   END IF;
 
   RETURN null;
@@ -70,7 +70,7 @@ BEGIN
 	  content := content || jsonb_build_object('reply_markup', reply_markup);
 	END IF;
 
-    RETURN http.create_request(format('https://api.telegram.org/bot%s/editMessageText', v_token), 'POST', jsonb_build_object('Content-Type', 'application/json'), content::text, null, null, 'telegram', bot_id::text, 'sendMessage');
+    RETURN http.create_request(format('https://api.telegram.org/bot%s/editMessageText', v_token), 'native', 'POST', jsonb_build_object('Content-Type', 'application/json'), content::text, null, null, 'telegram', bot_id::text, 'sendMessage');
   END IF;
 
   RETURN null;
@@ -108,7 +108,7 @@ BEGIN
 	  content := content || jsonb_build_object('reply_markup', reply_markup);
 	END IF;
 
-    RETURN http.create_request(format('https://api.telegram.org/bot%s/sendDocument', v_token), 'POST', jsonb_build_object('Content-Type', 'application/json'), content::text, null, null, 'telegram', bot_id::text, 'sendDocument');
+    RETURN http.create_request(format('https://api.telegram.org/bot%s/sendDocument', v_token), 'native', 'POST', jsonb_build_object('Content-Type', 'application/json'), content::text, null, null, 'telegram', bot_id::text, 'sendDocument');
   END IF;
 
   RETURN null;
@@ -152,7 +152,7 @@ BEGIN
 
     content := concat(content, format(E'\r\n\r\n--%s--', boundary));
 
-    RETURN http.create_request(format('https://api.telegram.org/bot%s/sendDocument', v_token), 'POST', jsonb_build_object('Content-Type', format('multipart/form-data; boundary=%s', boundary)), content, null, null, 'telegram', bot_id::text, 'sendDocument');
+    RETURN http.create_request(format('https://api.telegram.org/bot%s/sendDocument', v_token), 'native', 'POST', jsonb_build_object('Content-Type', format('multipart/form-data; boundary=%s', boundary)), content, null, null, 'telegram', bot_id::text, 'sendDocument');
   END IF;
 
   RETURN null;
@@ -189,7 +189,7 @@ BEGIN
 	  content := content || jsonb_build_object('show_alert', show_alert);
 	END IF;
 
-    RETURN http.create_request(format('https://api.telegram.org/bot%s/answerCallbackQuery', v_token), 'POST', jsonb_build_object('Content-Type', 'application/json'), content::text, null, null, 'telegram', bot_id::text, 'answerCallbackQuery');
+    RETURN http.create_request(format('https://api.telegram.org/bot%s/answerCallbackQuery', v_token), 'native', 'POST', jsonb_build_object('Content-Type', 'application/json'), content::text, null, null, 'telegram', bot_id::text, 'answerCallbackQuery');
   END IF;
 
   RETURN null;
@@ -213,7 +213,7 @@ BEGIN
   SELECT token INTO v_token FROM bot.list WHERE id = bot_id;
 
   IF FOUND THEN
-    RETURN http.create_request(format('https://api.telegram.org/bot%s/getFile', v_token), 'POST', jsonb_build_object('Content-Type', 'application/json'), jsonb_build_object('file_id', file_id)::text, 'bot.get_file_done', 'bot.get_file_fail', 'telegram', bot_id::text, 'getFile');
+    RETURN http.create_request(format('https://api.telegram.org/bot%s/getFile', v_token), 'native', 'POST', jsonb_build_object('Content-Type', 'application/json'), jsonb_build_object('file_id', file_id)::text, 'bot.get_file_done', 'bot.get_file_fail', 'telegram', bot_id::text, 'getFile');
   END IF;
 
   RETURN null;
@@ -238,7 +238,7 @@ BEGIN
   SELECT token INTO v_token FROM bot.list WHERE id = bot_id;
 
   IF FOUND THEN
-    RETURN http.create_request(format('https://api.telegram.org/file/bot%s/%s', v_token, file_path), 'GET', jsonb_build_object('Content-Type', 'application/json'), null, 'bot.get_file_done', 'bot.get_file_fail', 'telegram', bot_id::text, 'file_path', file_id);
+    RETURN http.create_request(format('https://api.telegram.org/file/bot%s/%s', v_token, file_path), 'native', 'GET', jsonb_build_object('Content-Type', 'application/json'), null, 'bot.get_file_done', 'bot.get_file_fail', 'telegram', bot_id::text, 'file_path', file_id);
   END IF;
 
   RETURN null;
