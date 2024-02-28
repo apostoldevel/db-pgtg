@@ -39,7 +39,7 @@ BEGIN
       data := json_build_object('bot_id', bot_id, 'chat_id', chat_id);
 	END IF;
 
-    RETURN http.create_request(format('https://api.telegram.org/bot%s/sendMessage', v_token), 'native', 'POST', jsonb_build_object('Content-Type', 'application/json'), content::text, callback_done, callback_fail, 'telegram', bot_id::text, 'sendMessage', message, data);
+    RETURN http.create_request(format('https://api.telegram.org/bot%s/sendMessage', v_token), 'native', 'POST', jsonb_build_object('Content-Type', 'application/json'), convert_to(content::text, 'utf8'), callback_done, callback_fail, 'telegram', bot_id::text, 'sendMessage', message, data);
   END IF;
 
   RETURN null;
@@ -75,7 +75,7 @@ BEGIN
       data := json_build_object('bot_id', bot_id, 'chat_id', chat_id, 'message_id', message_id);
 	END IF;
 
-    RETURN http.create_request(format('https://api.telegram.org/bot%s/deleteMessage', v_token), 'native', 'POST', jsonb_build_object('Content-Type', 'application/json'), content::text, callback_done, callback_fail, 'telegram', bot_id::text, 'deleteMessage', message, data);
+    RETURN http.create_request(format('https://api.telegram.org/bot%s/deleteMessage', v_token), 'native', 'POST', jsonb_build_object('Content-Type', 'application/json'), convert_to(content::text, 'utf8'), callback_done, callback_fail, 'telegram', bot_id::text, 'deleteMessage', message, data);
   END IF;
 
   RETURN null;
@@ -122,7 +122,7 @@ BEGIN
       data := json_build_object('bot_id', bot_id, 'chat_id', chat_id);
 	END IF;
 
-    RETURN http.create_request(format('https://api.telegram.org/bot%s/editMessageText', v_token), 'native', 'POST', jsonb_build_object('Content-Type', 'application/json'), content::text, callback_done, callback_fail, 'telegram', bot_id::text, 'sendMessage', message, data);
+    RETURN http.create_request(format('https://api.telegram.org/bot%s/editMessageText', v_token), 'native', 'POST', jsonb_build_object('Content-Type', 'application/json'), convert_to(content::text, 'utf8'), callback_done, callback_fail, 'telegram', bot_id::text, 'sendMessage', message, data);
   END IF;
 
   RETURN null;
@@ -168,7 +168,7 @@ BEGIN
       data := json_build_object('bot_id', bot_id, 'chat_id', chat_id);
 	END IF;
 
-    RETURN http.create_request(format('https://api.telegram.org/bot%s/sendDocument', v_token), 'native', 'POST', jsonb_build_object('Content-Type', 'application/json'), content::text, callback_done, callback_fail, 'telegram', bot_id::text, 'sendDocument', message, data);
+    RETURN http.create_request(format('https://api.telegram.org/bot%s/sendDocument', v_token), 'native', 'POST', jsonb_build_object('Content-Type', 'application/json'), convert_to(content::text, 'utf8'), callback_done, callback_fail, 'telegram', bot_id::text, 'sendDocument', message, data);
   END IF;
 
   RETURN null;
@@ -220,7 +220,7 @@ BEGIN
 
     content := concat(content, format(E'\r\n\r\n--%s--', boundary));
 
-    RETURN http.create_request(format('https://api.telegram.org/bot%s/sendDocument', v_token), 'native', 'POST', jsonb_build_object('Content-Type', format('multipart/form-data; boundary=%s', boundary)), content, callback_done, callback_fail, 'telegram', bot_id::text, 'sendDocument', message, data);
+    RETURN http.create_request(format('https://api.telegram.org/bot%s/sendDocument', v_token), 'native', 'POST', jsonb_build_object('Content-Type', format('multipart/form-data; boundary=%s', boundary)), convert_to(content, 'utf8'), callback_done, callback_fail, 'telegram', bot_id::text, 'sendDocument', message, data);
   END IF;
 
   RETURN null;
@@ -265,7 +265,7 @@ BEGIN
       data := json_build_object('bot_id', bot_id, 'query_id', query_id);
 	END IF;
 
-    RETURN http.create_request(format('https://api.telegram.org/bot%s/answerCallbackQuery', v_token), 'native', 'POST', jsonb_build_object('Content-Type', 'application/json'), content::text, callback_done, callback_fail, 'telegram', bot_id::text, 'answerCallbackQuery', message, data);
+    RETURN http.create_request(format('https://api.telegram.org/bot%s/answerCallbackQuery', v_token), 'native', 'POST', jsonb_build_object('Content-Type', 'application/json'), convert_to(content::text, 'utf8'), callback_done, callback_fail, 'telegram', bot_id::text, 'answerCallbackQuery', message, data);
   END IF;
 
   RETURN null;
@@ -301,7 +301,7 @@ BEGIN
 	  data := json_build_object('bot_id', bot_id, 'file_id', file_id);
     END IF;
 
-    RETURN http.create_request(format('https://api.telegram.org/bot%s/getFile', v_token), 'native', 'POST', jsonb_build_object('Content-Type', 'application/json'), jsonb_build_object('file_id', file_id)::text, callback_done, callback_fail, 'telegram', bot_id::text, 'getFile', message, data);
+    RETURN http.create_request(format('https://api.telegram.org/bot%s/getFile', v_token), 'native', 'POST', jsonb_build_object('Content-Type', 'application/json'), convert_to(jsonb_build_object('file_id', file_id)::text, 'utf8'), callback_done, callback_fail, 'telegram', bot_id::text, 'getFile', message, data);
   END IF;
 
   RETURN null;
