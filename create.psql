@@ -2,4 +2,6 @@
 \ir table.sql
 \ir view.sql
 \ir routine.sql
+\ir api.sql
+\ir webhook.sql
 \ir init.sql
