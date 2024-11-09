@@ -277,6 +277,50 @@ $$ LANGUAGE plpgsql
   SET search_path = tg, pg_temp;
 
 --------------------------------------------------------------------------------
+-- https://core.telegram.org/bots/api#sendphoto --------------------------------
+--------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION tg.send_photo (
+  bot_id        uuid,
+  chat_id       bigint,
+  photo         text,
+  caption       text DEFAULT null,
+  parse_mode    text DEFAULT null,
+  reply_markup  jsonb DEFAULT null,
+  callback_done text DEFAULT null,
+  callback_fail text DEFAULT null,
+  message       text DEFAULT null,
+  data          jsonb DEFAULT null
+) RETURNS       uuid
+AS $$
+DECLARE
+  content       jsonb;
+BEGIN
+  content := jsonb_build_object('chat_id', chat_id, 'photo', photo);
+
+  IF caption IS NOT NULL THEN
+    content := content || jsonb_build_object('caption', caption);
+  END IF;
+
+  IF parse_mode IS NOT NULL THEN
+    content := content || jsonb_build_object('parse_mode', parse_mode);
+  END IF;
+
+  IF reply_markup IS NOT NULL THEN
+    content := content || jsonb_build_object('reply_markup', reply_markup);
+  END IF;
+
+  IF data IS NULL THEN
+    data := json_build_object('bot_id', bot_id, 'chat_id', chat_id);
+  END IF;
+
+  RETURN tg.fetch(bot_id, 'sendPhoto', 'sendPhoto', content, null, callback_done, callback_fail, coalesce(message, caption), data);
+END;
+$$ LANGUAGE plpgsql
+  SECURITY DEFINER
+  SET search_path = tg, pg_temp;
+
+--------------------------------------------------------------------------------
 -- https://core.telegram.org/bots/api#answercallbackquery ----------------------
 --------------------------------------------------------------------------------
 
