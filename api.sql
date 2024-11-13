@@ -113,9 +113,7 @@ BEGIN
     content := content || jsonb_build_object('reply_markup', reply_markup);
   END IF;
 
-  IF data IS NULL THEN
-    data := json_build_object('bot_id', bot_id, 'chat_id', chat_id);
-  END IF;
+  data := coalesce(data, jsonb_build_object()) || jsonb_build_object('bot_id', bot_id, 'chat_id', chat_id);
 
   RETURN tg.fetch(bot_id, 'sendMessage', 'sendMessage', content, null, callback_done, callback_fail, message, data);
 END;
@@ -142,9 +140,7 @@ DECLARE
 BEGIN
   content := jsonb_build_object('chat_id', chat_id, 'message_id', message_id);
 
-  IF data IS NULL THEN
-    data := json_build_object('bot_id', bot_id, 'chat_id', chat_id, 'message_id', message_id);
-  END IF;
+  data := coalesce(data, jsonb_build_object()) || jsonb_build_object('bot_id', bot_id, 'chat_id', chat_id, 'message_id', message_id);
 
   RETURN tg.fetch(bot_id, 'deleteMessage', 'deleteMessage', content, null, callback_done, callback_fail, message, data);
 END;
@@ -182,9 +178,7 @@ BEGIN
     content := content || jsonb_build_object('reply_markup', reply_markup);
   END IF;
 
-  IF data IS NULL THEN
-    data := json_build_object('bot_id', bot_id, 'chat_id', chat_id);
-  END IF;
+  data := coalesce(data, jsonb_build_object()) || jsonb_build_object('bot_id', bot_id, 'chat_id', chat_id);
 
   RETURN tg.fetch(bot_id, 'editMessageText', 'editMessageText', content, null, callback_done, callback_fail, message, data);
 END;
@@ -221,9 +215,7 @@ BEGIN
     content := content || jsonb_build_object('reply_markup', reply_markup);
   END IF;
 
-  IF data IS NULL THEN
-    data := json_build_object('bot_id', bot_id, 'chat_id', chat_id);
-  END IF;
+  data := coalesce(data, jsonb_build_object()) || jsonb_build_object('bot_id', bot_id, 'chat_id', chat_id);
 
   RETURN tg.fetch(bot_id, 'sendDocument', 'sendDocument', content, null, callback_done, callback_fail, message, data);
 END;
@@ -251,9 +243,7 @@ DECLARE
   boundary      text;
   content       text;
 BEGIN
-  IF data IS NULL THEN
-    data := json_build_object('bot_id', bot_id, 'chat_id', chat_id, 'file_name', file_name);
-  END IF;
+  data := coalesce(data, jsonb_build_object()) || jsonb_build_object('bot_id', bot_id, 'chat_id', chat_id, 'file_name', file_name);
 
   content_type := coalesce(content_type, 'text/plain');
 
@@ -310,9 +300,7 @@ BEGIN
     content := content || jsonb_build_object('reply_markup', reply_markup);
   END IF;
 
-  IF data IS NULL THEN
-    data := json_build_object('bot_id', bot_id, 'chat_id', chat_id);
-  END IF;
+  data := coalesce(data, jsonb_build_object()) || jsonb_build_object('bot_id', bot_id, 'chat_id', chat_id);
 
   RETURN tg.fetch(bot_id, 'sendPhoto', 'sendPhoto', content, null, callback_done, callback_fail, coalesce(message, caption), data);
 END;
@@ -348,9 +336,7 @@ BEGIN
     content := content || jsonb_build_object('show_alert', show_alert);
   END IF;
 
-  IF data IS NULL THEN
-    data := json_build_object('bot_id', bot_id, 'query_id', query_id);
-  END IF;
+  data := coalesce(data, jsonb_build_object()) || jsonb_build_object('bot_id', bot_id, 'query_id', query_id);
 
   RETURN tg.fetch(bot_id, 'answerCallbackQuery', 'answerCallbackQuery', content, null, callback_done, callback_fail, message, data);
 END;
@@ -372,9 +358,7 @@ CREATE OR REPLACE FUNCTION tg.get_file (
 ) RETURNS       uuid
 AS $$
 BEGIN
-  IF data IS NULL THEN
-    data := json_build_object('bot_id', bot_id, 'file_id', file_id);
-  END IF;
+  data := coalesce(data, jsonb_build_object()) || jsonb_build_object('bot_id', bot_id, 'file_id', file_id);
 
   RETURN tg.fetch(bot_id, 'getFile', 'getFile', jsonb_build_object('file_id', file_id), null, callback_done, callback_fail, message, data);
 END;
@@ -401,9 +385,7 @@ BEGIN
     message := file_path;
   END IF;
 
-  IF data IS NULL THEN
-    data := json_build_object('bot_id', bot_id, 'file_id', file_id, 'file_path', file_path);
-  END IF;
+  data := coalesce(data, jsonb_build_object()) || jsonb_build_object('bot_id', bot_id, 'file_id', file_id, 'file_path', file_path);
 
   RETURN tg.fetch(bot_id, file_path, 'File', null::text, null, callback_done, callback_fail, message, data, 'GET');
 END;
