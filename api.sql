@@ -28,9 +28,9 @@ BEGIN
   IF FOUND THEN
     IF command = 'File' THEN
       v_resource := format('https://api.telegram.org/file/bot%s/%s', r.token, resource);
-	ELSE
+    ELSE
       v_resource := format('https://api.telegram.org/bot%s/%s', r.token, resource);
-	END IF;
+    END IF;
 
     RETURN http.create_request(v_resource, 'curl', method, headers, convert_to(content, 'utf8'), callback_done, callback_fail, null, 'telegram', r.username, command, message, data);
   END IF;
@@ -71,9 +71,9 @@ BEGIN
 
     IF command = 'File' THEN
       v_resource := format('https://api.telegram.org/file/bot%s/%s', r.token, resource);
-	ELSE
+    ELSE
       v_resource := format('https://api.telegram.org/bot%s/%s', r.token, resource);
-	END IF;
+    END IF;
 
     RETURN http.create_request(v_resource, 'curl', method, headers, convert_to(content::text, 'utf8'), callback_done, callback_fail, null, 'telegram', r.username, command, message, data);
   END IF;
@@ -89,16 +89,17 @@ $$ LANGUAGE plpgsql
 --------------------------------------------------------------------------------
 
 CREATE OR REPLACE FUNCTION tg.send_message (
-  bot_id        uuid,
-  chat_id       bigint,
-  text          text,
-  parse_mode    text DEFAULT null,
-  reply_markup  jsonb DEFAULT null,
-  callback_done text DEFAULT null,
-  callback_fail text DEFAULT null,
-  message       text DEFAULT null,
-  data          jsonb DEFAULT null
-) RETURNS       uuid
+  bot_id            uuid,
+  chat_id           bigint,
+  text              text,
+  parse_mode        text DEFAULT null,
+  reply_parameters  jsonb DEFAULT null,
+  reply_markup      jsonb DEFAULT null,
+  callback_done     text DEFAULT null,
+  callback_fail     text DEFAULT null,
+  message           text DEFAULT null,
+  data              jsonb DEFAULT null
+) RETURNS           uuid
 AS $$
 DECLARE
   content       jsonb;
@@ -109,6 +110,10 @@ BEGIN
     content := content || jsonb_build_object('parse_mode', parse_mode);
   END IF;
 
+  IF reply_parameters IS NOT NULL THEN
+    content := content || jsonb_build_object('reply_parameters', reply_parameters);
+  END IF;
+
   IF reply_markup IS NOT NULL THEN
     content := content || jsonb_build_object('reply_markup', reply_markup);
   END IF;
@@ -116,6 +121,52 @@ BEGIN
   data := coalesce(data, jsonb_build_object()) || jsonb_build_object('bot_id', bot_id, 'chat_id', chat_id);
 
   RETURN tg.fetch(bot_id, 'sendMessage', 'sendMessage', content, null, callback_done, callback_fail, message, data);
+END;
+$$ LANGUAGE plpgsql
+  SECURITY DEFINER
+  SET search_path = tg, pg_temp;
+
+--------------------------------------------------------------------------------
+-- https://core.telegram.org/bots/api#sendinvoice ------------------------------
+--------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION tg.send_invoice (
+  bot_id            uuid,
+  chat_id           bigint,
+  title             text,
+  description       text,
+  payload           text,
+  currency          text,
+  prices            jsonb,
+  provider_token    text DEFAULT null,
+  reply_parameters  jsonb DEFAULT null,
+  reply_markup      jsonb DEFAULT null,
+  callback_done     text DEFAULT null,
+  callback_fail     text DEFAULT null,
+  message           text DEFAULT null,
+  data              jsonb DEFAULT null
+) RETURNS           uuid
+AS $$
+DECLARE
+  content       jsonb;
+BEGIN
+  content := jsonb_build_object('chat_id', chat_id, 'title', title, 'description', description, 'payload', payload, 'currency', currency, 'prices', prices);
+
+  IF provider_token IS NOT NULL THEN
+    content := content || jsonb_build_object('provider_token', provider_token);
+  END IF;
+
+  IF reply_parameters IS NOT NULL THEN
+    content := content || jsonb_build_object('reply_parameters', reply_parameters);
+  END IF;
+
+  IF reply_markup IS NOT NULL THEN
+    content := content || jsonb_build_object('reply_markup', reply_markup);
+  END IF;
+
+  data := coalesce(data, jsonb_build_object()) || jsonb_build_object('bot_id', bot_id, 'chat_id', chat_id, 'payload', payload);
+
+  RETURN tg.fetch(bot_id, 'sendInvoice', 'sendInvoice', content, null, callback_done, callback_fail, message, data);
 END;
 $$ LANGUAGE plpgsql
   SECURITY DEFINER
