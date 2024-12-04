@@ -173,6 +173,39 @@ $$ LANGUAGE plpgsql
   SET search_path = tg, pg_temp;
 
 --------------------------------------------------------------------------------
+-- https://core.telegram.org/bots/api#answerprecheckoutquery -------------------
+--------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION tg.answer_pre_checkout_query (
+  bot_id            uuid,
+  chat_id           bigint,
+  query_id          text,
+  ok                boolean,
+  error_message     text DEFAULT null,
+  callback_done     text DEFAULT null,
+  callback_fail     text DEFAULT null,
+  message           text DEFAULT null,
+  data              jsonb DEFAULT null
+) RETURNS           uuid
+AS $$
+DECLARE
+  content       jsonb;
+BEGIN
+  content := jsonb_build_object('pre_checkout_query_id', query_id, 'ok', ok);
+
+  IF error_message IS NOT NULL THEN
+    content := content || jsonb_build_object('error_message', error_message);
+  END IF;
+
+  data := coalesce(data, jsonb_build_object()) || jsonb_build_object('bot_id', bot_id, 'chat_id', chat_id);
+
+  RETURN tg.fetch(bot_id, 'answerPreCheckoutQuery', 'answerPreCheckoutQuery', content, null, callback_done, callback_fail, message, data);
+END;
+$$ LANGUAGE plpgsql
+  SECURITY DEFINER
+  SET search_path = tg, pg_temp;
+
+--------------------------------------------------------------------------------
 -- https://core.telegram.org/bots/api#deleteMessage ----------------------------
 --------------------------------------------------------------------------------
 
