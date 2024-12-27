@@ -476,3 +476,109 @@ END;
 $$ LANGUAGE plpgsql
   SECURITY DEFINER
   SET search_path = tg, pg_temp;
+
+--------------------------------------------------------------------------------
+-- https://core.telegram.org/bots/api#setmycommands ----------------------------
+--------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION tg.set_my_commands (
+  bot_id        uuid,
+  commands      jsonb,
+  scope         text DEFAULT null,
+  language_code text DEFAULT null,
+  callback_done text DEFAULT null,
+  callback_fail text DEFAULT null,
+  message       text DEFAULT null,
+  data          jsonb DEFAULT null
+) RETURNS       uuid
+AS $$
+DECLARE
+  content       jsonb;
+BEGIN
+  content := jsonb_build_object('commands', commands);
+
+  IF scope IS NOT NULL THEN
+    content := content || jsonb_build_object('scope', scope);
+  END IF;
+
+  IF language_code IS NOT NULL THEN
+    content := content || jsonb_build_object('language_code', language_code);
+  END IF;
+
+  data := coalesce(data, jsonb_build_object()) || jsonb_build_object('bot_id', bot_id);
+
+  RETURN tg.fetch(bot_id, 'setMyCommands', 'setMyCommands', content, null, callback_done, callback_fail, message, data);
+END;
+$$ LANGUAGE plpgsql
+  SECURITY DEFINER
+  SET search_path = tg, pg_temp;
+
+--------------------------------------------------------------------------------
+-- https://core.telegram.org/bots/api#deletemycommands -------------------------
+--------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION tg.delete_my_commands (
+  bot_id        uuid,
+  scope         text DEFAULT null,
+  language_code text DEFAULT null,
+  callback_done text DEFAULT null,
+  callback_fail text DEFAULT null,
+  message       text DEFAULT null,
+  data          jsonb DEFAULT null
+) RETURNS       uuid
+AS $$
+DECLARE
+  content       jsonb;
+BEGIN
+  content := jsonb_build_object();
+
+  IF scope IS NOT NULL THEN
+    content := content || jsonb_build_object('scope', scope);
+  END IF;
+
+  IF language_code IS NOT NULL THEN
+    content := content || jsonb_build_object('language_code', language_code);
+  END IF;
+
+  data := coalesce(data, jsonb_build_object()) || jsonb_build_object('bot_id', bot_id);
+
+  RETURN tg.fetch(bot_id, 'deleteMyCommands', 'deleteMyCommands', content, null, callback_done, callback_fail, message, data);
+END;
+$$ LANGUAGE plpgsql
+  SECURITY DEFINER
+  SET search_path = tg, pg_temp;
+
+--------------------------------------------------------------------------------
+-- https://core.telegram.org/bots/api#getemycommands ---------------------------
+--------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION tg.get_my_commands (
+  bot_id        uuid,
+  scope         text DEFAULT null,
+  language_code text DEFAULT null,
+  callback_done text DEFAULT null,
+  callback_fail text DEFAULT null,
+  message       text DEFAULT null,
+  data          jsonb DEFAULT null
+) RETURNS       uuid
+AS $$
+DECLARE
+  content       jsonb;
+BEGIN
+  content := jsonb_build_object();
+
+  IF scope IS NOT NULL THEN
+    content := content || jsonb_build_object('scope', scope);
+  END IF;
+
+  IF language_code IS NOT NULL THEN
+    content := content || jsonb_build_object('language_code', language_code);
+  END IF;
+
+  data := coalesce(data, jsonb_build_object()) || jsonb_build_object('bot_id', bot_id);
+
+  RETURN tg.fetch(bot_id, 'getMyCommands', 'getMyCommands', content, null, callback_done, callback_fail, message, data);
+END;
+$$ LANGUAGE plpgsql
+  SECURITY DEFINER
+  SET search_path = tg, pg_temp;
